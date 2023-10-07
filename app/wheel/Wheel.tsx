@@ -1,54 +1,45 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 
-interface Props {
-  options: string[];
+interface WheelOfFortuneProps {
+  items: string[];
 }
 
-const Wheel: React.FC<Props> = ({ options }) => {
-  const [selectedOption, setSelectedOption] = useState<string | null>(null);
-  const rotationRef = useRef<number>(0);
+const WheelOfFortune: React.FC<WheelOfFortuneProps> = ({ items }) => {
+  const [rotation, setRotation] = useState<number>(0);
 
-  const spinWheel = () => {
-    const spins = Math.floor(Math.random() * 4 + 3); // 3 to 6 full spins
-    const randomDegree = Math.random() * 360;
-    rotationRef.current += 360 * spins + randomDegree;
-    const selectedIdx = Math.floor(options.length * (randomDegree / 360));
-    setSelectedOption(options[selectedIdx]);
-
-    document.getElementById('wheel')!.style.transform = `rotate(${rotationRef.current}deg)`;
+  const spin = () => {
+    const spins = Math.floor(Math.random() * 5) + 3; // Spin at least 3 times and at most 8 times
+    const degrees = Math.floor(Math.random() * 360);
+    const totalRotation = spins * 360 + degrees;
+    setRotation(rotation + totalRotation);
   };
 
   return (
-    <div className="flex flex-col items-center">
-      <div
-        id="wheel"
-        className="w-64 h-64 border-4 border-gray-900 rounded-full bg-white text-center relative"
-      >
-        {options.map((option, idx) => (
+    <div className="flex flex-col items-center mt-8">
+      <div className="w-72 h-72 rounded-full border-4 border-gray-800 relative transform transition-transform duration-1000 ease-in-out"
+           style={{ transform: `rotate(${rotation}deg)` }}>
+        {items.map((item, index) => (
           <div
-            key={idx}
-            className="absolute w-full h-full text-gray-900"
+            key={index}
+            className={`absolute w-1/2 h-1/2 bg-${index % 2 === 0 ? 'gray-300' : 'gray-400'} text-center line-clamp-1 leading-36 transform-origin-right-top`}
             style={{
-              transform: `rotate(${idx * (360 / options.length)}deg)`,
+              transform: `translateY(50%) translateX(50%) rotate(${360 / items.length * index}deg) rotate(90deg)`
             }}
           >
-            <div className="absolute top-1/2 transform -translate-y-1/2 -translate-x-1/2 left-1/2 text-sm">
-              {option}
-            </div>
+            {item}
           </div>
         ))}
       </div>
-      <button
-        onClick={spinWheel}
-        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded shadow hover:bg-blue-600"
+      <button 
+        onClick={spin}
+        className="mt-4 p-2 px-4 bg-blue-600 text-white rounded"
       >
-        Spin the Wheel!
+        Spin
       </button>
-      {selectedOption && <div className="mt-4">Selected: {selectedOption}</div>}
     </div>
   );
-};
+}
 
-export default Wheel;
+export default WheelOfFortune;
